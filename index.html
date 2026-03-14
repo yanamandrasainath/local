@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura AI | Support Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --primary: #007bff;
+            --bot-bubble: #ffffff;
+            --user-bubble: #007bff;
+            --text-main: #1c1e21;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+        /* Chat Window */
+        .chat-card {
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .status-dot { width: 10px; height: 10px; background: #42b72a; border-radius: 50%; border: 2px solid white; }
+
+        /* Chat Area */
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f9f9f9;
+        }
+
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; position: relative; }
+        .bot { background: var(--bot-bubble); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .user { background: var(--user-bubble); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .typing { font-size: 12px; color: #888; margin-left: 5px; display: none; }
+
+        /* Input Area */
+        .chat-footer {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            border: none;
+            background: #f0f2f5;
+            padding: 12px 15px;
+            border-radius: 25px;
+            outline: none;
+        }
+        button { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-card">
+        <div class="chat-header">
+            <div style="position: relative;">
+                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🤖</div>
+                <div class="status-dot" style="position: absolute; bottom: 0; right: 0;"></div>
+            </div>
+            <div>
+                <h4 style="margin: 0;">Aura Assistant</h4>
+                <p style="font-size: 11px; opacity: 0.8;">AI Powered Support</p>
+            </div>
+        </div>
+
+        <div class="chat-body" id="chatContainer">
+            <div class="msg bot">Hello! I'm Aura. How can I help you today?</div>
+        </div>
+
+        <div class="typing" id="typingIndicator">Aura is thinking...</div>
+
+        <div class="chat-footer">
+            <input type="text" id="userInput" placeholder="Ask about pricing, features..." onkeypress="handleKey(event)">
+            <button onclick="sendMessage()">➔</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Simple FAQ Dataset (Training Data)
+        const knowledgeBase = {
+            "hello": "Hi there! How can I assist you with our services today?",
+            "pricing": "Our plans start from $19/month for individuals and $99/month for teams.",
+            "hours": "We are open 24/7 for digital support, and 9 AM - 5 PM for human consultation.",
+            "refund": "We offer a 30-day money-back guarantee if you aren't satisfied.",
+            "human": "I can escalate this to a human agent. Would you like to wait?",
+            "default": "That's a great question! I'm still learning, but you can check our documentation for more details."
+        };
+
+        function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim().toLowerCase();
+            if (!text) return;
+
+            // User Message
+            addMessage(input.value, 'user');
+            input.value = "";
+
+            // Bot Thinking Simulation
+            typingIndicator.style.display = "block";
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            setTimeout(() => {
+                typingIndicator.style.display = "none";
+                const response = findResponse(text);
+                addMessage(response, 'bot');
+            }, 1000);
+        }
+
+        function findResponse(input) {
+            for (let key in knowledgeBase) {
+                if (input.includes(key)) return knowledgeBase[key];
+            }
+            return knowledgeBase["default"];
+        }
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            div.innerText = text;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
